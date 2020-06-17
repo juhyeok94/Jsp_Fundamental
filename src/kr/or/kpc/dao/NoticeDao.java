@@ -68,23 +68,24 @@ public class NoticeDao {
 		PreparedStatement pstmt = null;
 
 		try {
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/kpc", "kpc12", "kpc1234");
+			con = ConnLocator.getConnect();
 
 			StringBuffer sql = new StringBuffer();
-			sql.append("UPDATE notice");
-			sql.append("SET n_writer='?', n_title='?', n_content='?' ");
+			sql.append("UPDATE notice ");
+			sql.append("SET n_writer=?, n_title=?, n_content=?, ");
 			sql.append("n_regdate=NOW() ");
 			sql.append("WHERE n_num= ? ");
 
 			pstmt = con.prepareStatement(sql.toString());
 
 			int index = 0;
-			pstmt.setInt(++index, dto.getNum());
+			
 			pstmt.setString(++index, dto.getWriter());
 			pstmt.setString(++index, dto.getTitle());
 			pstmt.setString(++index, dto.getContent());
+			pstmt.setInt(++index, dto.getNum());
 
-			
+			resultCount = pstmt.executeUpdate();
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -207,9 +208,9 @@ public class NoticeDao {
 			con = ConnLocator.getConnect();
 					
 			StringBuffer sql = new StringBuffer();
-			sql.append("SELECT n_num, n_writer, n_title, n_content ");
+			sql.append("SELECT n_num, n_writer, n_title, n_content, ");
 			sql.append("DATE_FORMAT(n_regdate, '%Y.%m.%d %h:%i') ");
-			sql.append("FROM notice");
+			sql.append("FROM notice ");
 			sql.append("WHERE n_num=? ");
 
 			pstmt = con.prepareStatement(sql.toString());
@@ -299,7 +300,54 @@ public class NoticeDao {
 		}
 		return count;
 	}
+//============================
 	
+	public int getMaxNum() {
+		int max = 0;
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			con = ConnLocator.getConnect();
+			
+			StringBuffer sql = new StringBuffer();
+			
+			sql.append("SELECT ifnull(MAX(n_num)+1,1) FROM notice");
+			
+			
+			pstmt = con.prepareStatement(sql.toString());
+			
+			int index=0;
+			rs = pstmt.executeQuery();
+			if (rs.next()) {
+				index = 0;
+				max = rs.getInt(++index);
+				
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			
+			try {
+				if (rs != null)
+					rs.close();
+				
+				if (pstmt != null)
+					pstmt.close();
+				
+				if (con != null)
+					con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		return max;
+	}
 	
 	
 	
