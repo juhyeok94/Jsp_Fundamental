@@ -17,12 +17,12 @@
 	} catch (NumberFormatException e) {
 		cPage = 1;
 	}
-/*
-cPage=1 => 1-10 start:0
-cpage=2 => 11-20 start:10
-cPage=3 => 21-30 start:20
-An = a1+(n-1)*d
-*/
+	/*
+	cPage=1 => 1-10 start:0
+	cpage=2 => 11-20 start:10
+	cPage=3 => 21-30 start:20
+	An = a1+(n-1)*d
+	*/
 	NoticeDao dao = NoticeDao.getInstance();
 	int start = (cPage - 1) * displayCount;
 	ArrayList<NoticeDto> list = dao.select(start, displayCount);
